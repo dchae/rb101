@@ -25,7 +25,7 @@ end
 a = get_number
 b = get_number("second")
 
-puts help = ">> Enter operation (add, sub, mul, div): "
+puts HELP = ">> Enter operation (add, sub, mul, div): "
 
 while true
   op = gets.chomp.downcase
@@ -39,7 +39,7 @@ while true
   when "div"
     res = a / b.to_f
   else
-    puts "Not a valid operation", help
+    puts "Not a valid operation", HELP
     next
   end
   break

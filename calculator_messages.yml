@@ -1,0 +1,11 @@
+welcome: "Welcome to Calculator! Enter your name: "
+invalid_: "Not a valid "
+help: "
+  Enter operation:
+  \n  add      (a)
+  \n  subtract (s)
+  \n  multiply (m)
+  \n  divide   (d)
+  "
+zero_div_error: "Division by zero is not allowed."
+quit: "Thank you for using the calculator.\nGoodbye!"
