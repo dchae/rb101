@@ -1,4 +1,4 @@
-# Naive solution
+# Naive algebraic solution
 def rowsum(row)
   i = 1
   firstnum = 2
