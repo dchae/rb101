@@ -1,64 +1,18 @@
-order_data = [
-  {
-    customer_id: 12,
-    customer_name: "Emma Lopez",
-    order_id: 351,
-    order_date: "12/04/16",
-    order_fulfilled: true,
-    order_value: 135.99,
-  },
-  {
-    customer_id: 12,
-    customer_name: "Emma Lopez",
-    order_id: 383,
-    order_date: "12/04/16",
-    order_fulfilled: true,
-    order_value: 289.49,
-  },
-  {
-    customer_id: 12,
-    customer_name: "Emma Lopez",
-    order_id: 392,
-    order_date: "01/10/17",
-    order_fulfilled: false,
-    order_value: 58.00,
-  },
-  {
-    customer_id: 32,
-    customer_name: "Michael Richards",
-    order_id: 241,
-    order_date: "11/10/16",
-    order_fulfilled: true,
-    order_value: 120.00,
-  },
-  {
-    customer_id: 32,
-    customer_name: "Michael Richards",
-    order_id: 395,
-    order_date: "01/10/17",
-    order_fulfilled: false,
-    order_value: 85.65,
-  },
-  # rest of data...
-]
-
-customer_orders = [
-  {
-    customer_id: 12,
-    customer_name: "Emma Lopez",
-    orders: [
-      { order_fulfilled: true, order_value: 135.99 },
-      { order_fulfilled: true, order_value: 289.49 },
-      { order_fulfilled: false, order_value: 58.00 },
-    ],
-  },
-  {
-    customer_id: 32,
-    customer_name: "Michael Richards",
-    orders: [
-      { order_fulfilled: true, order_value: 120.00 },
-      { order_fulfilled: false, order_value: 85.65 },
-    ],
-  },
-  # rest of data...
-]
+require "pry"
+require "debug"
+hsh = {
+  first: %w[the quick],
+  second: %w[brown fox],
+  third: ["jumped"],
+  fourth: %w[over the lazy dog],
+}
+# hsh.values.flatten.join.scan(/[aeiou]/i).each { |vowel| p vowel }
+# OR
+hsh.each do |k, v|
+  v.each do |word|
+    word.chars do |char|
+      binding.b
+      p char if char.match?(/[aeiou]/i)
+    end
+  end
+end
