@@ -1,8 +1,8 @@
 # initialise constants
 CELL_WIDTH = 7
 CELL_HEIGHT = 3
-HORIZONTAL_SEPARATOR = ["-" * CELL_WIDTH] * 3 * "+" + "\n"
-HORIZONTAL_SPACER = [" " * CELL_WIDTH] * 3 * "|" + "\n"
+HORIZONTAL_SEPARATOR = "#{["-" * CELL_WIDTH] * 3 * "+"}\n"
+HORIZONTAL_SPACER = "#{[" " * CELL_WIDTH] * 3 * "|"}\n"
 PLAYER_MARKER = "X"
 CPU_MARKER = "O"
 
@@ -11,10 +11,25 @@ def prompt(*msgs)
   msgs.each { |msg| puts "=> #{msg}" }
 end
 
+def joinor(arr, sep = ", ", pen = "or")
+  case arr.length
+  when 0
+    ""
+  when 1
+    arr[0]
+  when 2
+    arr.join(" #{pen} ")
+  else
+    "#{arr[...-1].join(sep)}#{sep}#{pen} #{arr[-1]}"
+  end
+end
+
 def initialise_board(numbered_squares = false)
-  numbered_squares ?
-    (0..2).map { |row| (0..2).map { |col| (row * 3 + col).to_s } } :
-    board = Array.new(3) { Array.new(3, " ") }
+  if numbered_squares
+    (0..2).map { |row| (0..2).map { |col| (row * 3 + col).to_s } }
+  else
+    Array.new(3) { Array.new(3, " ") }
+  end
 end
 
 def empty_squares(brd)
@@ -34,13 +49,13 @@ end
 def display_board(brd)
   system("clear")
   puts "You are #{PLAYER_MARKER}. Computer is #{CPU_MARKER}"
-  puts "\n" + rendered_row(brd)
+  puts "\n#{rendered_row(brd)}"
 end
 
 def get_player_move(brd)
-  while true
+  loop do
     empty = empty_squares(brd)
-    prompt "Please select a square: (#{empty.join(", ")})"
+    prompt "Please select a square: (#{joinor(empty)})"
     move = gets.chomp.to_i
     return move if empty.include?(move)
     prompt "Not a valid move."
@@ -53,16 +68,19 @@ def exec_move(brd, sq, marker)
   brd[row][col] = marker
 end
 
-def winner(brd)
+def winning_lines(brd)
   lines = []
   brd.each { |horizontal| lines << horizontal }
-  (0..2).each do |col|
+  3.times do |col|
     vertical = (0..2).map { |row| brd[row][col] }
     lines << vertical
   end
   lines << (0..2).map { |i| brd[i][i] }
   lines << (0..2).map { |i| brd[i][2 - i] }
-  lines.each do |line|
+end
+
+def winner(brd)
+  winning_lines(brd).each do |line|
     return "Player" if line.all?(PLAYER_MARKER)
     return "Computer" if line.all?(CPU_MARKER)
   end
@@ -70,7 +88,7 @@ def winner(brd)
 end
 
 # main program
-while true
+loop do
   board = initialise_board
   winner = false
   while !(winner || empty_squares(board).empty?)
