@@ -6,6 +6,9 @@ HORIZONTAL_SPACER = "#{[" " * CELL_WIDTH] * 3 * "|"}\n"
 PLAYER_MARKER = "X"
 CPU_MARKER = "O"
 
+# init variables
+score = { "Player" => 0, "Computer" => 0 }
+
 # methods
 def prompt(*msgs)
   msgs.each { |msg| puts "=> #{msg}" }
@@ -46,9 +49,9 @@ def rendered_row(brd)
     .join(HORIZONTAL_SEPARATOR)
 end
 
-def display_board(brd)
+def display_board(brd, s)
   system("clear")
-  puts "You are #{PLAYER_MARKER}. Computer is #{CPU_MARKER}"
+  puts "Score: \nPlayer (#{PLAYER_MARKER}): #{s["Player"]}. Computer (#{CPU_MARKER}): #{s["Computer"]}."
   puts "\n#{rendered_row(brd)}"
 end
 
@@ -92,7 +95,7 @@ loop do
   board = initialise_board
   winner = false
   while !(winner || empty_squares(board).empty?)
-    display_board(board)
+    display_board(board, score)
     player_move = get_player_move(board)
     exec_move(board, player_move, PLAYER_MARKER)
     winner = winner(board)
@@ -102,9 +105,22 @@ loop do
     winner = winner(board)
   end
 
-  display_board(board)
-  prompt(!winner ? "It's a tie!" : "#{winner} wins!")
-  prompt("Play again? (y/n)")
+  score[winner] += 1 if winner
+
+  display_board(board, score)
+  if score.values.max < 5
+    prompt(!winner ? "It's a tie!" : "#{winner} wins this round!")
+  else
+    prompt("#{score.max_by { |k, v| v }[0]} wins the game!")
+    prompt("The final score was: ")
+    puts("   #{score.map { |p, s| "#{p}: #{s}" }.join(", ")}")
+    prompt("Play again? (y/n)")
+    break unless gets.chomp.start_with?("y")
+    score.clear
+    next
+  end
+
+  prompt("Play next round? (y/n)")
   break unless gets.chomp.start_with?("y")
 end
 prompt("Goodbye!")
