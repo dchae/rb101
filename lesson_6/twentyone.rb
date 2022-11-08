@@ -34,23 +34,54 @@ def hand(deck, who)
 end
 
 def display_hands(deck, dealer_hidden = true)
-  puts("Your hand: #{hand(deck, PLAYER)}")
-  puts(
-    "Dealer hand: #{dealer_hidden ? hand(deck, DEALER).first : hand(deck, DEALER)}",
-  )
+  dealer_hand = dealer_hidden ? hand(deck, DEALER).first : hand(deck, DEALER)
+  dealer_value = dealer_hidden ? "Hidden" : hand_value(deck, DEALER)
+  puts("Dealer hand: #{dealer_hand}. Value: #{dealer_value}")
+  puts("Your hand: #{hand(deck, PLAYER)}. Value: #{hand_value(deck, PLAYER)}")
 end
 
-def value(face)
+def face_value(face)
   # if face is a number, return number
-  # elsif face is a, return ace logic
+  # if face is "a" (ace), return 11
   # else return 10
+  if %w[j q k].include?(face)
+    return 10
+  elsif face == "a"
+    return 11
+  else
+    return face
+  end
 end
 
-def busted?(deck, PLAYER)
-  deck.reduce(0) { |hand, who| who == PLAYER ? value(hand[1]) : 0} > 21
+def hand_value(deck, player)
+  hand = deck.select { |card, who| who == player }
+  max_value = hand.reduce(0) { |sum, (card, who)| sum + face_value(card[1]) }
+  ace_count = hand.count { |card, who| card[1] == "a" }
+  (0..ace_count)
+    .map { |i| max_value - 10 * i }
+    .find(proc { max_value - 10 * ace_count }) { |hand_value| hand_value <= 21 }
 end
 
+def busted?(deck, player)
+  hand_value(deck, player) > 21
 end
+
+def display_results(deck)
+  p_score, d_score = [PLAYER, DEALER].map { |who| hand_value(deck, who) }
+
+  if p_score > 21
+    prompt("You busted! Dealer wins.")
+  elsif d_score > 21
+    prompt("Dealer busts. You win!")
+  elsif d_score > p_score
+    prompt("Dealer wins.")
+  elsif p_score > d_score
+    prompt("You win!")
+  else
+    prompt("Tie!")
+  end
+end
+
 def main()
   deck = init_deck
 
@@ -59,13 +90,26 @@ def main()
 
   # player turn
   while !busted?(deck, PLAYER)
-    display_hands(deck) # not yet implemented
+    display_hands(deck)
     prompt("Would you like to hit or stay? (h/s)")
     choice = gets.chomp.downcase()
-    break if choice.start_with?("s")
+    if choice.start_with?("s")
+      prompt("You stayed.")
+      break
+    end
     newcard = draw_random(deck, PLAYER)
     prompt("You drew #{newcard}")
   end
+
+  if !busted?(deck, PLAYER)
+    # dealer turn
+    while hand_value(deck, DEALER) < 17
+      puts("Dealer drew #{draw_random(deck, DEALER)}.")
+    end
+  end
+
+  display_hands(deck, false)
+  display_results(deck)
 end
 
 main
