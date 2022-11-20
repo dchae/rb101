@@ -15,7 +15,7 @@ def prompt(*msgs)
   msgs.each { |msg| puts("=> #{msg}") }
 end
 
-def init_deck()
+def init_deck
   deck = {}
   %w[H D C S].each do |suit|
     (2..10).to_a.concat(%w[j q k a]).each { |face| deck[[suit, face]] = nil }
@@ -24,13 +24,13 @@ def init_deck()
 end
 
 def draw_random(deck, who)
-  choice = deck.select { |k, v| v == nil }.keys.sample
+  choice = deck.select { |_, v| v.nil? }.keys.sample
   deck[choice] = who
-  return choice
+  choice
 end
 
 def hand(deck, who)
-  deck.select { |k, v| v == who }.map { |hand, who| hand }
+  deck.select { |_, v| v == who }.map { |hand, _| hand }
 end
 
 def display_hands(deck, dealer_hidden = true)
@@ -41,25 +41,23 @@ def display_hands(deck, dealer_hidden = true)
 end
 
 def face_value(face)
-  # if face is a number, return number
-  # if face is "a" (ace), return 11
-  # else return 10
   if %w[j q k].include?(face)
-    return 10
+    10
   elsif face == "a"
-    return 11
+    11
   else
-    return face
+    face
   end
 end
 
 def hand_value(deck, player)
-  hand = deck.select { |card, who| who == player }
-  max_value = hand.reduce(0) { |sum, (card, who)| sum + face_value(card[1]) }
-  ace_count = hand.count { |card, who| card[1] == "a" }
-  (0..ace_count)
-    .map { |i| max_value - 10 * i }
-    .find(proc { max_value - 10 * ace_count }) { |hand_value| hand_value <= 21 }
+  hand = deck.select { |_, who| who == player }
+  value_ceil = hand.reduce(0) { |sum, (card, _)| sum + face_value(card[1]) }
+  ace_count = hand.count { |card, _| card[1] == "a" }
+  possible_values = (0..ace_count).map { |i| value_ceil - 10 * i }
+  possible_values.find(proc { value_ceil - 10 * ace_count }) do |hand_value|
+    hand_value <= 21
+  end
 end
 
 def busted?(deck, player)
@@ -82,7 +80,7 @@ def display_results(deck)
   end
 end
 
-def main()
+def main
   deck = init_deck
 
   # initial deal
@@ -92,10 +90,13 @@ def main()
   while !busted?(deck, PLAYER)
     display_hands(deck)
     prompt("Would you like to hit or stay? (h/s)")
-    choice = gets.chomp.downcase()
+    choice = gets.chomp.downcase
     if choice.start_with?("s")
       prompt("You stayed.")
       break
+    elsif !choice.start_with?("h")
+      prompt("Not a valid choice.")
+      next
     end
     newcard = draw_random(deck, PLAYER)
     prompt("You drew #{newcard}")
@@ -112,4 +113,8 @@ def main()
   display_results(deck)
 end
 
-main
+loop do
+  main
+  prompt("Would you like to play again? (y/n)")
+  break if gets.chomp.downcase.start_with?("n")
+end
