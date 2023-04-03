@@ -39,7 +39,7 @@ def empty_squares(brd)
   brd.flatten.each_with_index.map { |v, i| i if v =~ /[^XO]/ }.compact
 end
 
-def rendered_row(brd)
+def rendered_rows(brd)
   (0..2)
     .map do |row|
       HORIZONTAL_SPACER * (CELL_HEIGHT / 2) +
@@ -52,7 +52,7 @@ end
 def display_board(brd, s)
   system("clear")
   puts "Score: \nPlayer (#{PLAYER_MARKER}): #{s["Player"]}. Computer (#{CPU_MARKER}): #{s["Computer"]}."
-  puts "\n#{rendered_row(brd)}"
+  puts "\n#{rendered_rows(brd)}"
 end
 
 # base case:
